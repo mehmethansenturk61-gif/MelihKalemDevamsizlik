@@ -8,7 +8,7 @@ const dersListesi = [
     hoca: "Matematik Bölümü", 
     gun: "Pazartesi", 
     saat: "09:00 - 12:00", 
-    sinif: "D-101", 
+    sinif: "Derslik", 
     limit: 8 // Çok saatli ders -> 8 Hak
   },
   { 
@@ -26,15 +26,15 @@ const dersListesi = [
     hoca: "Öğr. Üyesi (A Grubu)", 
     gun: "Salı", 
     saat: "08:00 - 12:00", 
-    sinif: "Amfi-2", 
-    limit: 8 // Çok saatli ders -> 8 Hak
+    sinif: "Derslik", 
+    limit: 8 
   },
   { 
     ad: "Sayısal Analiz", 
     hoca: "Dr. Öğr. Üyesi", 
     gun: "Salı", 
     saat: "13:00 - 16:00", 
-    sinif: "D-102", 
+    sinif: "Derslik", 
     limit: 8 
   },
 
@@ -44,7 +44,7 @@ const dersListesi = [
     hoca: "Doç. Dr. (A Grubu)", 
     gun: "Çarşamba", 
     saat: "09:00 - 12:00", 
-    sinif: "Amfi-1", 
+    sinif: "Derslik", 
     limit: 8 
   },
   { 
@@ -53,7 +53,7 @@ const dersListesi = [
     gun: "Çarşamba", 
     saat: "20:00 - 20:50", 
     sinif: "UZEM (Online)", 
-    limit: 4 // 1 saatlik ders -> 4 Hak
+    limit: 4 
   },
 
   // --- PERŞEMBE ---
@@ -62,7 +62,7 @@ const dersListesi = [
     hoca: "Prof. Dr. Ayten ATASOY", 
     gun: "Perşembe", 
     saat: "10:00 - 12:00", 
-    sinif: "D-203", 
+    sinif: "Derslik", 
     limit: 8 
   },
   { 
@@ -70,7 +70,7 @@ const dersListesi = [
     hoca: "Yabancı Diller Y.O.", 
     gun: "Perşembe", 
     saat: "13:00 - 15:00", 
-    sinif: "D-105", 
+    sinif: "Derslik", 
     limit: 8 
   },
 
@@ -80,7 +80,7 @@ const dersListesi = [
     hoca: "Arş. Gör. (A Grubu)", 
     gun: "Cuma", 
     saat: "13:00 - 15:00", 
-    sinif: "Lab-1", 
+    sinif: "Laboratuvar", 
     limit: 8 
   },
   { 
@@ -89,7 +89,7 @@ const dersListesi = [
     gun: "Cuma", 
     saat: "11:00 - 11:30", 
     sinif: "UZEM (Online)", 
-    limit: 4 // 1 saatlik ders -> 4 Hak
+    limit: 4 
   }
 ];
 
@@ -99,14 +99,12 @@ function yukle() {
   container.innerHTML = "";
 
   dersListesi.forEach(ders => {
-    // localStorage anahtarı (Melih için unique)
+    // localStorage anahtarı
     const key = "melih_" + ders.ad; 
     const yapilan = Number(localStorage.getItem(key) || 0);
     const kalan = ders.limit - yapilan;
 
     let durum = "ok";
-    
-    // Yüzdelik Durum Hesaplama
     if (kalan <= 0) {
         durum = "tehlike";
     } else if (kalan <= 2) {
@@ -147,11 +145,9 @@ function yukle() {
 
 function degistir(key, miktar) {
   let yapilan = Number(localStorage.getItem(key) || 0);
-  
-  // İlgili dersin limitini bul
   const dersAdi = key.replace("melih_", "");
   const dersObj = dersListesi.find(d => d.ad === dersAdi);
-  const limit = dersObj ? dersObj.limit : 8; // Bulamazsa varsayılan 8
+  const limit = dersObj ? dersObj.limit : 8; 
 
   if (miktar > 0 && yapilan < limit) {
       yapilan++;
