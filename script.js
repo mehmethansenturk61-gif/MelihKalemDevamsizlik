@@ -1,5 +1,5 @@
-// KTÜ Elektrik-Elektronik 2. Sınıf (A Grubu - Türkçe) Ders Listesi
-// Not: Ana derslerin saatlerini bölüm panosuna göre güncelleyebilirsiniz.
+// KTÜ Elektrik-Elektronik 2. Sınıf (A Grubu - Türkçe)
+// Kural: Haftada 1 saat ders = 4 Hak | Diğerleri = 8 Hak
 
 const dersListesi = [
   // --- PAZARTESİ ---
@@ -9,7 +9,7 @@ const dersListesi = [
     gun: "Pazartesi", 
     saat: "09:00 - 12:00", 
     sinif: "D-101", 
-    limit: 12 // Haftada 3 saat -> 12 hak
+    limit: 8 // Çok saatli ders -> 8 Hak
   },
   { 
     ad: "Kariyer Planlama (USEC)", 
@@ -17,7 +17,7 @@ const dersListesi = [
     gun: "Pazartesi", 
     saat: "19:00 - 19:50", 
     sinif: "UZEM (Online)", 
-    limit: 4 // Haftada 1 saat -> 4 hak
+    limit: 4 // 1 saatlik ders -> 4 Hak
   },
 
   // --- SALI ---
@@ -27,7 +27,7 @@ const dersListesi = [
     gun: "Salı", 
     saat: "08:00 - 12:00", 
     sinif: "Amfi-2", 
-    limit: 16 // Haftada 4 saat -> 16 hak
+    limit: 8 // Çok saatli ders -> 8 Hak
   },
   { 
     ad: "Sayısal Analiz", 
@@ -35,7 +35,7 @@ const dersListesi = [
     gun: "Salı", 
     saat: "13:00 - 16:00", 
     sinif: "D-102", 
-    limit: 12 
+    limit: 8 
   },
 
   // --- ÇARŞAMBA ---
@@ -45,7 +45,7 @@ const dersListesi = [
     gun: "Çarşamba", 
     saat: "09:00 - 12:00", 
     sinif: "Amfi-1", 
-    limit: 12 
+    limit: 8 
   },
   { 
     ad: "Meslek Etiği (LUBEC)", 
@@ -53,7 +53,7 @@ const dersListesi = [
     gun: "Çarşamba", 
     saat: "20:00 - 20:50", 
     sinif: "UZEM (Online)", 
-    limit: 4 // Haftada 1 saat -> 4 hak
+    limit: 4 // 1 saatlik ders -> 4 Hak
   },
 
   // --- PERŞEMBE ---
@@ -63,7 +63,7 @@ const dersListesi = [
     gun: "Perşembe", 
     saat: "10:00 - 12:00", 
     sinif: "D-203", 
-    limit: 8 // Haftada 2 saat -> 8 hak (veya 3 ise 12)
+    limit: 8 
   },
   { 
     ad: "Mesleki İngilizce II", 
@@ -81,7 +81,7 @@ const dersListesi = [
     gun: "Cuma", 
     saat: "13:00 - 15:00", 
     sinif: "Lab-1", 
-    limit: 4 // Lablarda genelde hak azdır
+    limit: 8 
   },
   { 
     ad: "K. Verilerin Korunması (USEC)", 
@@ -89,7 +89,7 @@ const dersListesi = [
     gun: "Cuma", 
     saat: "11:00 - 11:30", 
     sinif: "UZEM (Online)", 
-    limit: 4 
+    limit: 4 // 1 saatlik ders -> 4 Hak
   }
 ];
 
@@ -99,21 +99,18 @@ function yukle() {
   container.innerHTML = "";
 
   dersListesi.forEach(ders => {
-    // localStorage anahtarı (Melih için unique olsun)
+    // localStorage anahtarı (Melih için unique)
     const key = "melih_" + ders.ad; 
     const yapilan = Number(localStorage.getItem(key) || 0);
     const kalan = ders.limit - yapilan;
 
     let durum = "ok";
-    let durumYazisi = "Güvendesin";
     
     // Yüzdelik Durum Hesaplama
     if (kalan <= 0) {
         durum = "tehlike";
-        durumYazisi = "Kaldın!";
     } else if (kalan <= 2) {
         durum = "uyari";
-        durumYazisi = "Dikkat!";
     }
 
     const div = document.createElement("div");
@@ -149,13 +146,12 @@ function yukle() {
 }
 
 function degistir(key, miktar) {
-  // Mevcut devamsızlığı al
   let yapilan = Number(localStorage.getItem(key) || 0);
   
   // İlgili dersin limitini bul
   const dersAdi = key.replace("melih_", "");
   const dersObj = dersListesi.find(d => d.ad === dersAdi);
-  const limit = dersObj ? dersObj.limit : 20;
+  const limit = dersObj ? dersObj.limit : 8; // Bulamazsa varsayılan 8
 
   if (miktar > 0 && yapilan < limit) {
       yapilan++;
