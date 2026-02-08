@@ -1,0 +1,176 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+  padding: 20px;
+  color: #333;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.header-container {
+  margin-bottom: 25px;
+}
+
+.profil {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.avatar {
+  font-size: 32px;
+  background: #fff3e0; /* Elektrik Müh için turuncu tonu */
+  color: #f57c00;
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.bilgi h2 {
+  margin: 0;
+  font-size: 19px;
+  color: #1a1a1a;
+}
+
+.bilgi p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+h1.baslik {
+  text-align: left;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-left: 5px;
+  font-weight: 700;
+}
+
+.ders {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+  transition: transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.ders:active {
+  transform: scale(0.98);
+}
+
+.ders-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ders-kod {
+  background: #eef2ff;
+  color: #4f46e5;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ders-hoca {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.ders h3 {
+  margin: 5px 0 15px 0;
+  font-size: 17px;
+  color: #222;
+  font-weight: 600;
+}
+
+.ders-program-bilgi {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ders-program-bilgi span {
+  background: #f8f9fa;
+  color: #555;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ders-program-bilgi i {
+  color: #f57c00;
+  font-size: 11px;
+}
+
+.bilgiler {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.kalan-badge {
+  font-weight: bold;
+}
+
+.kalan-badge.ok { color: #2e7d32; }
+.kalan-badge.uyari { color: #ed6c02; }
+.kalan-badge.tehlike { color: #d32f2f; }
+
+.butonlar {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+button:active { opacity: 0.8; }
+
+.arttir {
+  background: #ef5350; /* Kırmızı Ekle */
+  color: white;
+  box-shadow: 0 4px 10px rgba(239, 83, 80, 0.2);
+}
+
+.azalt {
+  background: #66bb6a; /* Yeşil Sil */
+  color: white;
+  box-shadow: 0 4px 10px rgba(102, 187, 106, 0.2);
+}
