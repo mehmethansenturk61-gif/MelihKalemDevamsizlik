@@ -1,4 +1,4 @@
-// KTÜ Elektrik-Elektronik 2. Sınıf (Sihirli Link Yedekleme)
+// KTÜ Elektrik-Elektronik 2. Sınıf (Mobil Uyumlu Yedekleme)
 
 const dersListesi = [
   { ad: "Devreler II", limit: 8 },
@@ -12,21 +12,26 @@ const dersListesi = [
 
 const container = document.getElementById("dersler");
 
-// Sayfa yüklendiğinde URL'de veri var mı diye bak (Geri Yükleme Kısmı)
+// Sayfa yüklendiğinde URL'de "Sihirli Link" var mı diye kontrol et
 window.addEventListener('load', () => {
-    const hash = window.location.hash.substring(1); // #'den sonrasını al
-    if (hash) {
+    // Eğer linkte # işareti ve sonrasında kod varsa
+    if (window.location.hash.length > 10) {
         try {
-            // Base64 şifresini çöz ve veriyi yükle
-            const cozulmusVeri = JSON.parse(atob(hash));
-            Object.keys(cozulmusVeri).forEach(key => {
-                localStorage.setItem(key, cozulmusVeri[key]);
+            const hash = window.location.hash.substring(1); // #'den sonrasını al
+            const jsonVeri = atob(hash); // Şifreyi çöz (Base64 decode)
+            const veriler = JSON.parse(jsonVeri);
+
+            // Verileri telefona kaydet
+            Object.keys(veriler).forEach(key => {
+                localStorage.setItem(key, veriler[key]);
             });
-            // URL'i temizle ki kafa karışmasın
+
+            // Adres çubuğunu temizle (linki normale çevir)
             history.replaceState("", document.title, window.location.pathname + window.location.search);
-            alert("Sihirli link algılandı! Tüm verilerin başarıyla geri yüklendi. ⚡️");
+            
+            alert("✅ Başarılı! Tüm ders verilerin geri yüklendi.");
         } catch (e) {
-            console.log("Link verisi geçersiz.");
+            console.log("Link verisi geçersiz veya boş.");
         }
     }
     yukle();
@@ -68,20 +73,20 @@ function yukle() {
     container.appendChild(div);
   });
 
-  // --- SİHİRLİ LİNK BUTONU ---
+  // --- MOBİL PAYLAŞIM ALANI ---
   const yedekDiv = document.createElement("div");
-  yedekDiv.style.marginTop = "30px";
+  yedekDiv.style.marginTop = "40px";
+  yedekDiv.style.marginBottom = "20px";
   yedekDiv.style.textAlign = "center";
-  yedekDiv.style.padding = "20px";
   yedekDiv.style.borderTop = "1px solid rgba(255,255,255,0.1)";
+  yedekDiv.style.paddingTop = "20px";
 
   yedekDiv.innerHTML = `
-    <button onclick="sihirliLinkKopyala()" style="background: linear-gradient(45deg, #8e44ad, #3498db); color:white; border:none; padding:12px 25px; border-radius:25px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-        <i class="fa-solid fa-link"></i> Verileri Link Olarak Kopyala
+    <button onclick="sihirliLinkPaylas()" style="background: linear-gradient(135deg, #25D366, #128C7E); color:white; border:none; padding:15px 30px; border-radius:30px; cursor:pointer; font-weight:bold; font-size:1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto;">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.4rem;"></i> Yedeği WhatsApp'a At
     </button>
-    <p style="color:#888; font-size:0.75rem; margin-top:10px;">
-        Bu butona basınca kopyalanan linki <strong>WhatsApp'tan kendine at.</strong><br>
-        O linke tıkladığın an verilerin geri gelir!
+    <p style="color:#888; font-size:0.8rem; margin-top:10px; max-width:80%; margin-left:auto; margin-right:auto;">
+        Bu butona bas, linki kendine gönder. Telefonun sıfırlansa bile o linke tıklayınca her şey geri gelir! 
     </p>
   `;
   
@@ -103,8 +108,9 @@ function degistir(dersAdi, miktar) {
   yukle();
 }
 
-// --- SİHİRLİ LİNK OLUŞTURMA ---
-function sihirliLinkKopyala() {
+// --- GELİŞMİŞ PAYLAŞIM FONKSİYONU ---
+async function sihirliLinkPaylas() {
+    // 1. Verileri topla
     const veriler = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -113,17 +119,30 @@ function sihirliLinkKopyala() {
         }
     }
 
-    // Veriyi şifrele (Base64) ve linke ekle
+    // 2. Linki oluştur
     const veriString = JSON.stringify(veriler);
-    const sifreliVeri = btoa(veriString); // Base64 encoding
+    const sifreliVeri = btoa(veriString); // Base64 şifreleme
     const magicLink = window.location.origin + window.location.pathname + "#" + sifreliVeri;
 
-    // Panoya kopyala
-    navigator.clipboard.writeText(magicLink).then(() => {
-        alert("✅ Link Kopyalandı!\n\nBu linki WhatsApp'tan kendine gönder veya notlarına yapıştır.\n\nVerilerin silinirse bu linke tıklaman yeterli!");
-    }).catch(err => {
-        alert("Kopyalama başarısız oldu. Lütfen manuel seçip kopyalayın: " + magicLink);
-    });
+    // 3. TELEFON PAYLAŞIM MENÜSÜNÜ AÇ
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Melih Ders Programı Yedeği',
+                text: 'Ders devamsızlık yedeğim burada. Tıklayınca geri yüklenir:',
+                url: magicLink
+            });
+        } catch (err) {
+            console.log("Paylaşım iptal edildi.");
+        }
+    } else {
+        // Eğer bilgisayardaysa veya eski telefonsa panoya kopyala
+        navigator.clipboard.writeText(magicLink).then(() => {
+            alert("🔗 Link Kopyalandı!\n\nBunu kendine WhatsApp'tan gönder.");
+        }).catch(err => {
+            prompt("Otomatik kopyalanamadı. Lütfen bu linki kopyala:", magicLink);
+        });
+    }
 }
 
 yukle();
