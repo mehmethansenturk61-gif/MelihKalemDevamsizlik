@@ -1,4 +1,4 @@
-// KTÜ Elektrik-Elektronik 2. Sınıf (Mobil Uyumlu Yedekleme)
+// KTÜ Elektrik-Elektronik 2. Sınıf (WhatsApp Fix)
 
 const dersListesi = [
   { ad: "Devreler II", limit: 8 },
@@ -12,31 +12,30 @@ const dersListesi = [
 
 const container = document.getElementById("dersler");
 
-// Sayfa yüklendiğinde URL'de "Sihirli Link" var mı diye kontrol et
+// --- 1. SİHİRLİ LİNK İLE GERİ YÜKLEME ---
+// Sayfa açıldığında linkte şifreli veri var mı diye bakar
 window.addEventListener('load', () => {
-    // Eğer linkte # işareti ve sonrasında kod varsa
     if (window.location.hash.length > 10) {
         try {
-            const hash = window.location.hash.substring(1); // #'den sonrasını al
-            const jsonVeri = atob(hash); // Şifreyi çöz (Base64 decode)
+            const hash = window.location.hash.substring(1);
+            const jsonVeri = atob(hash);
             const veriler = JSON.parse(jsonVeri);
 
-            // Verileri telefona kaydet
             Object.keys(veriler).forEach(key => {
                 localStorage.setItem(key, veriler[key]);
             });
 
-            // Adres çubuğunu temizle (linki normale çevir)
+            // Adres çubuğunu temizle
             history.replaceState("", document.title, window.location.pathname + window.location.search);
-            
-            alert("✅ Başarılı! Tüm ders verilerin geri yüklendi.");
+            alert("✅ Başarılı! Tüm veriler geri yüklendi.");
         } catch (e) {
-            console.log("Link verisi geçersiz veya boş.");
+            console.log("Link hatası.");
         }
     }
     yukle();
 });
 
+// --- 2. DERSLERİ LİSTELEME ---
 function yukle() {
   container.innerHTML = "";
 
@@ -73,26 +72,27 @@ function yukle() {
     container.appendChild(div);
   });
 
-  // --- MOBİL PAYLAŞIM ALANI ---
+  // --- WHATSAPP BUTONU ---
   const yedekDiv = document.createElement("div");
   yedekDiv.style.marginTop = "40px";
-  yedekDiv.style.marginBottom = "20px";
+  yedekDiv.style.marginBottom = "60px";
   yedekDiv.style.textAlign = "center";
   yedekDiv.style.borderTop = "1px solid rgba(255,255,255,0.1)";
   yedekDiv.style.paddingTop = "20px";
 
   yedekDiv.innerHTML = `
-    <button onclick="sihirliLinkPaylas()" style="background: linear-gradient(135deg, #25D366, #128C7E); color:white; border:none; padding:15px 30px; border-radius:30px; cursor:pointer; font-weight:bold; font-size:1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto;">
-        <i class="fa-brands fa-whatsapp" style="font-size:1.4rem;"></i> Yedeği WhatsApp'a At
+    <button onclick="whatsappGonder()" style="background: #25D366; color:white; border:none; padding:15px 30px; border-radius:30px; cursor:pointer; font-weight:bold; font-size:1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto;">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.5rem;"></i> Yedeği WhatsApp'a At
     </button>
-    <p style="color:#888; font-size:0.8rem; margin-top:10px; max-width:80%; margin-left:auto; margin-right:auto;">
-        Bu butona bas, linki kendine gönder. Telefonun sıfırlansa bile o linke tıklayınca her şey geri gelir! 
+    <p style="color:#888; font-size:0.8rem; margin-top:10px;">
+        Verilerini kaybetmemek için kendine gönder.
     </p>
   `;
   
   container.appendChild(yedekDiv);
 }
 
+// --- 3. VERİ GÜNCELLEME ---
 function degistir(dersAdi, miktar) {
   const key = "melih_" + dersAdi.replace(/\s/g, "");
   let yapilan = Number(localStorage.getItem(key) || 0);
@@ -108,9 +108,8 @@ function degistir(dersAdi, miktar) {
   yukle();
 }
 
-// --- GELİŞMİŞ PAYLAŞIM FONKSİYONU ---
-async function sihirliLinkPaylas() {
-    // 1. Verileri topla
+// --- 4. WHATSAPP GÖNDERME (Kesin Çalışan Yöntem) ---
+function whatsappGonder() {
     const veriler = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -119,30 +118,17 @@ async function sihirliLinkPaylas() {
         }
     }
 
-    // 2. Linki oluştur
     const veriString = JSON.stringify(veriler);
-    const sifreliVeri = btoa(veriString); // Base64 şifreleme
-    const magicLink = window.location.origin + window.location.pathname + "#" + sifreliVeri;
+    const sifreliVeri = btoa(veriString); 
+    
+    // Temiz URL al (hash olmadan)
+    const cleanUrl = window.location.origin + window.location.pathname;
+    const magicLink = cleanUrl + "#" + sifreliVeri;
 
-    // 3. TELEFON PAYLAŞIM MENÜSÜNÜ AÇ
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: 'Melih Ders Programı Yedeği',
-                text: 'Ders devamsızlık yedeğim burada. Tıklayınca geri yüklenir:',
-                url: magicLink
-            });
-        } catch (err) {
-            console.log("Paylaşım iptal edildi.");
-        }
-    } else {
-        // Eğer bilgisayardaysa veya eski telefonsa panoya kopyala
-        navigator.clipboard.writeText(magicLink).then(() => {
-            alert("🔗 Link Kopyalandı!\n\nBunu kendine WhatsApp'tan gönder.");
-        }).catch(err => {
-            prompt("Otomatik kopyalanamadı. Lütfen bu linki kopyala:", magicLink);
-        });
-    }
+    const mesaj = "Ders Programı Yedeğim (Tıkla Yüklensin): \n\n" + magicLink;
+    
+    // Direkt WhatsApp Linkini Aç
+    window.location.href = "https://wa.me/?text=" + encodeURIComponent(mesaj);
 }
 
 yukle();
