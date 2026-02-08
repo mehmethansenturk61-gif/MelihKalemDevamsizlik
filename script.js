@@ -1,5 +1,4 @@
-// KTÜ Elektrik-Elektronik 2. Sınıf (Sadeleştirilmiş Versiyon)
-// Sadece Ders Adı + Devamsızlık Takibi
+// KTÜ Elektrik-Elektronik 2. Sınıf (Sihirli Link Yedekleme)
 
 const dersListesi = [
   { ad: "Devreler II", limit: 8 },
@@ -13,23 +12,40 @@ const dersListesi = [
 
 const container = document.getElementById("dersler");
 
+// Sayfa yüklendiğinde URL'de veri var mı diye bak (Geri Yükleme Kısmı)
+window.addEventListener('load', () => {
+    const hash = window.location.hash.substring(1); // #'den sonrasını al
+    if (hash) {
+        try {
+            // Base64 şifresini çöz ve veriyi yükle
+            const cozulmusVeri = JSON.parse(atob(hash));
+            Object.keys(cozulmusVeri).forEach(key => {
+                localStorage.setItem(key, cozulmusVeri[key]);
+            });
+            // URL'i temizle ki kafa karışmasın
+            history.replaceState("", document.title, window.location.pathname + window.location.search);
+            alert("Sihirli link algılandı! Tüm verilerin başarıyla geri yüklendi. ⚡️");
+        } catch (e) {
+            console.log("Link verisi geçersiz.");
+        }
+    }
+    yukle();
+});
+
 function yukle() {
   container.innerHTML = "";
 
   dersListesi.forEach(ders => {
-    // localStorage'dan veriyi çek
     const key = "melih_" + ders.ad.replace(/\s/g, ""); 
     const yapilan = Number(localStorage.getItem(key) || 0);
     const kalan = ders.limit - yapilan;
 
-    // Renk durumunu ayarla
     let durum = "ok";
     if (kalan <= 0) durum = "tehlike";
     else if (kalan <= 2) durum = "uyari";
 
     const div = document.createElement("div");
     div.className = "ders";
-    // Daha sade bir tasarım için stil düzenlemesi
     div.style.textAlign = "center"; 
     div.style.padding = "15px";
 
@@ -51,6 +67,25 @@ function yukle() {
 
     container.appendChild(div);
   });
+
+  // --- SİHİRLİ LİNK BUTONU ---
+  const yedekDiv = document.createElement("div");
+  yedekDiv.style.marginTop = "30px";
+  yedekDiv.style.textAlign = "center";
+  yedekDiv.style.padding = "20px";
+  yedekDiv.style.borderTop = "1px solid rgba(255,255,255,0.1)";
+
+  yedekDiv.innerHTML = `
+    <button onclick="sihirliLinkKopyala()" style="background: linear-gradient(45deg, #8e44ad, #3498db); color:white; border:none; padding:12px 25px; border-radius:25px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <i class="fa-solid fa-link"></i> Verileri Link Olarak Kopyala
+    </button>
+    <p style="color:#888; font-size:0.75rem; margin-top:10px;">
+        Bu butona basınca kopyalanan linki <strong>WhatsApp'tan kendine at.</strong><br>
+        O linke tıkladığın an verilerin geri gelir!
+    </p>
+  `;
+  
+  container.appendChild(yedekDiv);
 }
 
 function degistir(dersAdi, miktar) {
@@ -66,6 +101,29 @@ function degistir(dersAdi, miktar) {
 
   localStorage.setItem(key, yapilan);
   yukle();
+}
+
+// --- SİHİRLİ LİNK OLUŞTURMA ---
+function sihirliLinkKopyala() {
+    const veriler = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("melih_")) {
+            veriler[key] = localStorage.getItem(key);
+        }
+    }
+
+    // Veriyi şifrele (Base64) ve linke ekle
+    const veriString = JSON.stringify(veriler);
+    const sifreliVeri = btoa(veriString); // Base64 encoding
+    const magicLink = window.location.origin + window.location.pathname + "#" + sifreliVeri;
+
+    // Panoya kopyala
+    navigator.clipboard.writeText(magicLink).then(() => {
+        alert("✅ Link Kopyalandı!\n\nBu linki WhatsApp'tan kendine gönder veya notlarına yapıştır.\n\nVerilerin silinirse bu linke tıklaman yeterli!");
+    }).catch(err => {
+        alert("Kopyalama başarısız oldu. Lütfen manuel seçip kopyalayın: " + magicLink);
+    });
 }
 
 yukle();
