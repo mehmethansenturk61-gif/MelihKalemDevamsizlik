@@ -1,4 +1,4 @@
-// KTÜ Elektrik-Elektronik 2. Sınıf (WhatsApp Fix)
+// KTÜ Elektrik-Elektronik 2. Sınıf (Türkçe Karakter Fix)
 
 const dersListesi = [
   { ad: "Devreler II", limit: 8 },
@@ -13,29 +13,31 @@ const dersListesi = [
 const container = document.getElementById("dersler");
 
 // --- 1. SİHİRLİ LİNK İLE GERİ YÜKLEME ---
-// Sayfa açıldığında linkte şifreli veri var mı diye bakar
 window.addEventListener('load', () => {
     if (window.location.hash.length > 10) {
         try {
             const hash = window.location.hash.substring(1);
-            const jsonVeri = atob(hash);
-            const veriler = JSON.parse(jsonVeri);
+            
+            // TÜRKÇE KARAKTER ÇÖZÜMÜ (Decode)
+            const decodedStr = decodeURIComponent(escape(atob(hash)));
+            const veriler = JSON.parse(decodedStr);
 
             Object.keys(veriler).forEach(key => {
                 localStorage.setItem(key, veriler[key]);
             });
 
-            // Adres çubuğunu temizle
+            // Linki temizle
             history.replaceState("", document.title, window.location.pathname + window.location.search);
             alert("✅ Başarılı! Tüm veriler geri yüklendi.");
         } catch (e) {
-            console.log("Link hatası.");
+            console.error(e);
+            alert("Link hatalı veya bozuk.");
         }
     }
     yukle();
 });
 
-// --- 2. DERSLERİ LİSTELEME ---
+// --- 2. LİSTELEME ---
 function yukle() {
   container.innerHTML = "";
 
@@ -75,7 +77,7 @@ function yukle() {
   // --- WHATSAPP BUTONU ---
   const yedekDiv = document.createElement("div");
   yedekDiv.style.marginTop = "40px";
-  yedekDiv.style.marginBottom = "60px";
+  yedekDiv.style.marginBottom = "80px";
   yedekDiv.style.textAlign = "center";
   yedekDiv.style.borderTop = "1px solid rgba(255,255,255,0.1)";
   yedekDiv.style.paddingTop = "20px";
@@ -92,7 +94,7 @@ function yukle() {
   container.appendChild(yedekDiv);
 }
 
-// --- 3. VERİ GÜNCELLEME ---
+// --- 3. GÜNCELLEME ---
 function degistir(dersAdi, miktar) {
   const key = "melih_" + dersAdi.replace(/\s/g, "");
   let yapilan = Number(localStorage.getItem(key) || 0);
@@ -108,27 +110,34 @@ function degistir(dersAdi, miktar) {
   yukle();
 }
 
-// --- 4. WHATSAPP GÖNDERME (Kesin Çalışan Yöntem) ---
+// --- 4. WHATSAPP GÖNDERME (HATA AYIKLAMALI) ---
 function whatsappGonder() {
-    const veriler = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("melih_")) {
-            veriler[key] = localStorage.getItem(key);
+    try {
+        const veriler = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith("melih_")) {
+                veriler[key] = localStorage.getItem(key);
+            }
         }
+
+        const veriString = JSON.stringify(veriler);
+        
+        // TÜRKÇE KARAKTER ÇÖZÜMÜ (Encode)
+        // unescape ve encodeURIComponent Türkçe karakterleri bozulmadan şifreler
+        const sifreliVeri = btoa(unescape(encodeURIComponent(veriString)));
+        
+        const cleanUrl = window.location.origin + window.location.pathname;
+        const magicLink = cleanUrl + "#" + sifreliVeri;
+
+        const mesaj = "Ders Programı Yedeğim (Tıkla Yüklensin): \n\n" + magicLink;
+        
+        // Android/iOS uyumlu yönlendirme
+        window.location.href = "https://wa.me/?text=" + encodeURIComponent(mesaj);
+        
+    } catch (err) {
+        alert("Bir hata oluştu: " + err.message);
     }
-
-    const veriString = JSON.stringify(veriler);
-    const sifreliVeri = btoa(veriString); 
-    
-    // Temiz URL al (hash olmadan)
-    const cleanUrl = window.location.origin + window.location.pathname;
-    const magicLink = cleanUrl + "#" + sifreliVeri;
-
-    const mesaj = "Ders Programı Yedeğim (Tıkla Yüklensin): \n\n" + magicLink;
-    
-    // Direkt WhatsApp Linkini Aç
-    window.location.href = "https://wa.me/?text=" + encodeURIComponent(mesaj);
 }
 
 yukle();
