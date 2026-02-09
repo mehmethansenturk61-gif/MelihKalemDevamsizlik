@@ -2,7 +2,7 @@
 
 const dersListesi = [
   { ad: "Devreler II", limit: 8 },
-  { ad: "Mühendislikte İngilizce II", limit: 8 },
+  { ad: "Mühendislikte İngilizce II", limit: 4 },
   { ad: "Sayısal Çözümleme", limit: 8 },
   { ad: "Elektronik I", limit: 8 },
   { ad: "Mühendislik Matematiği", limit: 8 },
